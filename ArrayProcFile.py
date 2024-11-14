@@ -106,7 +106,6 @@ def fileStatsResult(count,lineArray):
 #    etc
 #   User has permissons to read the file
 #
-# 
 def main():
 
 	wkdir = "C:\\MyPythonProjects\\JOC-AdvProbSolvg\\ArraysAndFiles-JOC-APS\\"
