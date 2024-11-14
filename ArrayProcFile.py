@@ -84,9 +84,9 @@ def fileStatsResult(count,lineArray):
 	fl=0
 	sl=count-2
 	ll=count-1
-	print("First line is ",lineArray[fl]\n")
-	print("Second to last line is ",lineArray[sl]\n")
-	print("Last line is ",lineArray[ll]\n")
+	print("First line is ",lineArray[fl])
+	print("Second to last line is ",lineArray[sl])
+	print("Last line is ",lineArray[ll])
 	print("<=====================================>")
 	print("TOTAL LINE COUNT IS: ",count)
 
@@ -95,8 +95,6 @@ def fileStatsResult(count,lineArray):
 # -------------------------------------------------------------------------------
 #  main program
 # -------------------------------------------------------------------------------
-
-main()
 #
 #  The working directory is hardcoded and input file is homed at program start.
 #
@@ -104,20 +102,25 @@ main()
 #  -------------------------------
 #   Directory path exists
 #   File exists
-#   File is a regular text file and not a special file, e.g. directory, socket, executable program, etc
+#   File is a regular text file and not a special file, e.g. directory, socket, executable program,
+#    etc
 #   User has permissons to read the file
 #
+# 
+def main():
 
-	wkdir="C:\MyPythonProjects\JOC-AdvProbSolvg\ArraysAndFiles-JOC-APS\"
-	wd=wd.strip()                                                      # removes any trailing spaces or leading ~
+	wkdir = "C:\\MyPythonProjects\\JOC-AdvProbSolvg\\ArraysAndFiles-JOC-APS\\"
+
+	wkdir=wkdir.strip()                               # removes any trailing spaces or leading ~
 	fileIn="turing.txt" 
-        print("Current directory where input and output files exist / created is ",cwd)
+	print("Current directory where input and output files exist / created is ",cwd)
 	if not os.path.exists(wkdir):
 		print("Directory path ",wkdir," does not exist. Closing")	
 		exit(1)	
-        filePath=os.path.join(wkdir, fileIn)
+
+	filePath=os.path.join(wkdir, fileIn)
 	filePathTest=Path(filePath)
-   	if not os.path.exists(filePath):
+	if not os.path.exists(filePath):
 		print("File ",fileIn," cannot be found or path ",wkdir," is wrong file path. Closing")
 		exit(1)	
 	if not filePathTest.Path.is_file():
@@ -130,8 +133,8 @@ main()
 #
 #  File and path exist and file useable by program. Now get the lines
 #	
-        lineCount=0
-        fileLines=[]
+	lineCount=0
+	fileLines=[]
 	lineCount,fileLines=file_content(filePath)
 #
 #  If lineCount < 2 then cannot fulfill the request. 
@@ -139,13 +142,4 @@ main()
 #  Else first is index 0 and last two are linecount-1 and linecount-2
 #
 
- 	if linecount < 2:
-		print("Uable to fulfill program requirements with 0 or 1 lines in input file, closing")
-		exit(-1)
-	else
-		fileStatsResult(linecount,fileLines)	
-		print("\n\n **** END OF PROGRAM RUN ****")
-		
-	
-	
-print("\n<<<<<<<<<<<<<<<<<<<<< END OF PROGRAM >>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+main()
