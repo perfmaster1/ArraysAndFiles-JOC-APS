@@ -36,14 +36,29 @@
 #      http://emhill.github.io/150/morea/10.dict//data/turing.txt & save to your computer 
 #       or  upload to repl.it.
 #
+#  NOTE: If we wanted to find out the file type if not a regular file we would use
+#        python-magic or 
+# #      filetype library:       https://github.com/h2non/filetype.py
 #
+#  Certain functions associated with os.path are used in this code. 
+#  Guidance for importing os vs os.path can be found in this StackOverflow article:
+#  Should I use `import os.path` or `import os`?
+#    https://stackoverflow.com/questions/2724348/should-i-use-import-os-path-or-import-os
+#    https://docs.python.org/3/library/os.path.html#os.path.isfile
+#
+#  I found that if I wanted to use os.path.is_file(filePath) just import os  was not enough to
+#  avoid an error. 
+#
+#  An intersting code line is as follows:
+#   filePathTest=Path(filePath)   -- but requires pathlib library and python 3.4
+#  I dispensed with this in favor of os / os.path 
 #
 #  Author: Daniel Wroblewski
 #    Date: 11/10/2024
 #   Status: Authoring
 # @@==================================================================================================@@
 
-import os
+import os   #, os.path 
 from pathlib import Path
 
 # -------------------------------------------------------------------------------
@@ -62,6 +77,7 @@ def is_readable(filepath):
 def file_content(filePath):
 	lineCount=0
 	fileStr=[]
+	i=0
 
 	with open(filePath, 'r') as fn:
 		lineCount=sum(i for lines in fn)
@@ -107,25 +123,43 @@ def fileStatsResult(count,lineArray):
 #   User has permissons to read the file
 #
 def main():
-
+	#
+	#   Hardcoded working directory - no user input allowed
+	#
 	wkdir = "C:\\MyPythonProjects\\JOC-AdvProbSolvg\\ArraysAndFiles-JOC-APS\\"
 
-	wkdir=wkdir.strip()                               # removes any trailing spaces or leading ~
+	wkdir=wkdir.strip()       # removes any trailing spaces or leading ~
 	fileIn="turing.txt" 
-	print("Current directory where input and output files exist / created is ",cwd)
+
 	if not os.path.exists(wkdir):
-		print("Directory path ",wkdir," does not exist. Closing")	
-		exit(1)	
+		print("User selected work directory path ",wkdir," does not exist. Closing")	
+		exit(1)
+	if not os.path.isdir(wkdir):
+		print("Location ",wkdir," is not a directory. Closing")	
+		exit(1)
+	os.chdir(wkdir)
+	cwd=os.getcwd()
+	print("Current directory where input and output files exist / created is ",cwd)
 
 	filePath=os.path.join(wkdir, fileIn)
-	filePathTest=Path(filePath)
+
 	if not os.path.exists(filePath):
 		print("File ",fileIn," cannot be found or path ",wkdir," is wrong file path. Closing")
 		exit(1)	
-	if not filePathTest.Path.is_file():
+#
+#  file or directory testing
+#
+	if not os.path.isfile(filePath): 
+		if os.path.isdir(filePath):
+#		if os.access(filePath,os.R_OK):
+			print("filePath ",filePath," is a directory, not a file.")	 
 		print("File ",fileIn," is not a regular text readable file. Closing")
 		exit(1)			
-	if not filePathTest.Path.is_readable():
+#	if not filePath.is_readable():     # .Path after filePathTest
+#
+#   file readable test
+#
+	if not os.access(filePath,os.R_OK):
 		print("Current user does not have permissons to read file: ",filePath," ,Closing")
 		exit(1)	
 
