@@ -46,21 +46,21 @@
 #    https://stackoverflow.com/questions/2724348/should-i-use-import-os-path-or-import-os
 #    https://docs.python.org/3/library/os.path.html#os.path.isfile
 #
-#  I found that if I wanted to use os.path.is_file(filePath) just import os  was not enough to
-#  avoid an error. 
+#  I found os library to be sufficient for this program. 
 #
 #  An intersting code line is as follows:
 #   filePathTest=Path(filePath)   -- but requires pathlib library and python 3.4
-#  I dispensed with this in favor of os / os.path 
+#                                       'from pathlib import Path'
+#  >>> I dispensed with this in favor of os 
 #
 #  Author: Daniel Wroblewski
-#    Date: 11/10/2024
-#   Status: Authoring
+#    Date: 11/14/2024
+#   Status: COMPLETE
 # @@==================================================================================================@@
 
-import os   #, os.path 
-from pathlib import Path
+import os   
 
+#
 # -------------------------------------------------------------------------------
 #
 #  Function is_readable:  function to tell if the file can be read by the current user
@@ -69,30 +69,123 @@ from pathlib import Path
 def is_readable(filepath):
     return os.access(filepath, os.R_OK)
 
+
 # -------------------------------------------------------------------------------
+#
+#  Function is_readable:  function to tell if the file can be read by the current user
+#
+# -------------------------------------------------------------------------------
+def isExistNotDir(wDir):
+
+	if not os.path.exists(wDir):
+		print("User selected work directory path ",wDir," does not exist. Closing")	
+		return True
+	if not os.path.isdir(wDir):
+		print("Location ",wDir," is not a directory. Closing")	
+		return True
+
+	return False
+
+
+# -------------------------------------------------------------------------------
+#
+#  Function pathSet:  set up the paths for the program
+#
+# -------------------------------------------------------------------------------
+def pathSet(wkd):
+
+	os.chdir(wkd)         # anchor working dir to requested dir
+	currwd=os.getcwd()
+	print("Current directory where input and output files exist / created is ",currwd)
+	return
+
+
+# -------------------------------------------------------------------------------
+#
+#  Function existAsNotFileNotReadable:  set up the paths for the program
+#                                       Any failure condition returns True 
+#
+# -------------------------------------------------------------------------------
+
+def existAsNotFileNotReadable(fPath,f_in,wkd):
+#
+#  TEST: 'does path exist' :
+#
+	if not os.path.exists(fPath):
+		print("File ",f_in," cannot be found or path ",wkd," is wrong file path. Closing")
+		return True	
+#
+#  TEST: Is filePath a file or directory?
+#
+	if not os.path.isfile(fPath):    # not a file, test if dir then give up
+		if os.path.isdir(fPath):
+			print("filePath ",fPath," is a directory, not a file.")	 
+			return True
+		print("File ",f_in," is not a regular text readable file. Closing")
+		return True			
+#
+#   TEST: is file readable:
+#
+	if not is_readable(fPath):
+		print("Current user does not have permissons to read file: ",fPath," ,Closing")
+		return True
+
+	return False	
+
+
+# -------------------------------------------------------------------------------
+#
+#  Function minLine:  determine if the input file has enough lines to fulfill
+#                     the requirements. Must have 2 or more lines
+#
+#
+#  If lineCount < 2 then cannot fulfill the request. 
+#  If linecount 2 then index 0 is first and last two are index 0 and 1
+#  Else first is index 0 and last two are linecount-1 and linecount-2
+#	(will figure this out later) 
+#
+# -------------------------------------------------------------------------------
+def minLine(fp):
+
+	linesCount=sum(1 for _ in open(fp, 'r'))
+	if linesCount > 1:
+		return True
+
+	return False
+
+
+# -----------------------------------------------------------------------------------
 #
 #  Function file_content:  function to return number of lines and the array of 
 #                          file lines
-# -------------------------------------------------------------------------------
+#
+#  - open file multiple times, once for each operation/calculation/data struct build
+#
+# -----------------------------------------------------------------------------------
 def file_content(filePath):
 	lineCount=0
 	fileStr=[]
-	i=0
-
+#
+#  choose one method:  
+#
 	with open(filePath, 'r') as fn:
-		lineCount=sum(i for lines in fn)
-
+		lineCount=sum(1 for _ in fn)
+#
+#	lineCount=sum(1 for _ in open(filePath, 'r'))
+#
 	with open(filePath,'r') as fn2:
 		for lines in fn2:
-			fileStr.append(lines.strip())
+			fileStr.append(lines.strip())   # cleanup the line before array insert
 
 	fn.close()
 	fn2.close()	
 	return lineCount,fileStr	
-	
+
+
 # -------------------------------------------------------------------------------
 #
-#  Function fileStatsResult:  function to return requested information
+#  Function fileStatsResult:  function to return the result requested in the
+#                              assigned requirements in program header
 #
 # -------------------------------------------------------------------------------
 def fileStatsResult(count,lineArray):
@@ -121,58 +214,35 @@ def fileStatsResult(count,lineArray):
 #   File is a regular text file and not a special file, e.g. directory, socket, executable program,
 #    etc
 #   User has permissons to read the file
+#   and other conditions
 #
 def main():
 	#
 	#   Hardcoded working directory - no user input allowed
 	#
 	wkdir = "C:\\MyPythonProjects\\JOC-AdvProbSolvg\\ArraysAndFiles-JOC-APS\\"
-
+	#
 	wkdir=wkdir.strip()       # removes any trailing spaces or leading ~
-	fileIn="turing.txt" 
+	fileIn="turing.txt"       # input file
 
-	if not os.path.exists(wkdir):
-		print("User selected work directory path ",wkdir," does not exist. Closing")	
+	if isExistNotDir(wkdir):  # directory checks
 		exit(1)
-	if not os.path.isdir(wkdir):
-		print("Location ",wkdir," is not a directory. Closing")	
+
+	pathSet(wkdir)
+	filePath=os.path.join(wkdir, fileIn)    # add in filename to path as 'filePath'
+
+	if ( existAsNotFileNotReadable(filePath,fileIn,wkdir)  ):  # multiple checks
 		exit(1)
-	os.chdir(wkdir)
-	cwd=os.getcwd()
-	print("Current directory where input and output files exist / created is ",cwd)
 
-	filePath=os.path.join(wkdir, fileIn)
-
-	if not os.path.exists(filePath):
-		print("File ",fileIn," cannot be found or path ",wkdir," is wrong file path. Closing")
-		exit(1)	
+	if not minLine(filePath):            # input file must have 2 or more lines
+		exit(1)
 #
-#  file or directory testing
-#
-	if not os.path.isfile(filePath): 
-		if os.path.isdir(filePath):
-#		if os.access(filePath,os.R_OK):
-			print("filePath ",filePath," is a directory, not a file.")	 
-		print("File ",fileIn," is not a regular text readable file. Closing")
-		exit(1)			
-#	if not filePath.is_readable():     # .Path after filePathTest
-#
-#   file readable test
-#
-	if not os.access(filePath,os.R_OK):
-		print("Current user does not have permissons to read file: ",filePath," ,Closing")
-		exit(1)	
-
-#
-#  File and path exist and file useable by program. Now get the lines
+#  File and path exist and input file useable by program. Now get the lines:
 #	
 	lineCount=0
 	fileLines=[]
-	lineCount,fileLines=file_content(filePath)
-#
-#  If lineCount < 2 then cannot fulfill the request. 
-#  If linecount 2 then index 0 is first and last two are index 0 and 1
-#  Else first is index 0 and last two are linecount-1 and linecount-2
-#
+	lineCount,fileLines=file_content(filePath)   # calculate and parse input file
+
+	fileStatsResult(lineCount,fileLines)       # return required result
 
 main()
